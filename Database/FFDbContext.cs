@@ -9,12 +9,8 @@ namespace FFhub_backend.Database
         public DbSet<DBTag> Tags { get; set; }
         public DbSet<DBVideoTag> VideoTags { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            // Update this with your actual database connection string
-            optionsBuilder.UseSqlServer("YourConnectionStringHere");
-        }
-
+        public FFDbContext(DbContextOptions<FFDbContext> options) : base(options)
+        { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure many-to-many relationship for VideoTags
