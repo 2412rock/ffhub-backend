@@ -1,11 +1,55 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FFhub_backend.Models;
+using FFhub_backend.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FFhub_backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class DataController : ControllerBase
     {
+        private readonly DataService _dataService;
+        public DataController(DataService dataService)
+        {
+            _dataService = dataService;
+        }
+        [HttpGet]
+        [Route("videos")]
+        public async Task<IActionResult> GetVideos([FromQuery] string? tags)
+        {
+            List<int> tagsList = null;
+            if (!string.IsNullOrEmpty(tags))
+            {
+                tagsList = tags.Split(',').Select(id => int.Parse(id)).ToList();
+            }
+            
+            var result = await _dataService.GetVideos(1, tagsList);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("video")]
+        public async Task<IActionResult> GetVideo([FromQuery] int id)
+        {
+            var result = await _dataService.GetVideo(id);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("tags")]
+        public async Task<IActionResult> GetTags([FromQuery] string query)
+        {
+            var result = await _dataService.GetTags(query);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("suggest")]
+        public async Task<IActionResult> GetTags([FromBody] VideoSuggestion req)
+        {
+            var result = await _dataService.AddVideoSuggestion(req.Link, req.Title, req.Tags);
+            return Ok(result);
+        }
     }
 }
