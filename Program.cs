@@ -2,9 +2,16 @@ using FFhub_backend.Database;
 using FFhub_backend.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseKestrel(options =>
+{
+    options.Listen(IPAddress.Any, 4500, listenOptions =>
+    {
+    });
+});
 // Add services to the container.
 
 builder.Services.AddControllers();
