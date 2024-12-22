@@ -21,7 +21,7 @@ namespace FFhub_backend.Services
             var maybe = new Maybe<VideoAndTags>();
             try
             {
-                var video = await _dbContext.Videos.Include(v => v.VideoTags).ThenInclude(vt => vt.Tag).Where(e => e.VideoId == id).FirstOrDefaultAsync();
+                var video = await _dbContext.Videos.Include(v => v.VideoTags).ThenInclude(vt => vt.Tag).Where(e => e.VideoId == id && e.IsSuggestion == false).FirstOrDefaultAsync();
                 if(video != null)
                 {
                     var tags = new List<string>();
@@ -63,7 +63,7 @@ namespace FFhub_backend.Services
                 var skip = (page - 1) * pageSize;
                 var videosAndTags = new List<VideoAndTags>();
 
-                var query = _dbContext.Videos.Include(v => v.VideoTags).ThenInclude(vt => vt.Tag).AsQueryable();
+                var query = _dbContext.Videos.Include(v => v.VideoTags).ThenInclude(vt => vt.Tag).Where(e => e.IsSuggestion == false).AsQueryable();
 
                 var videos = await query
                             .Skip(skip)
