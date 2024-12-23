@@ -1,4 +1,4 @@
-﻿namespace FFhub_backend.Models
+﻿namespace FFhub_backend.Models.Requests
 {
     public class VideoSuggestion
     {

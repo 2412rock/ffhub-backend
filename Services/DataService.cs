@@ -54,7 +54,7 @@ namespace FFhub_backend.Services
             return maybe;
         }
 
-        public async Task<Maybe<List<VideoAndTags>>> GetVideos(int page, List<int> tagsSearch)
+        public async Task<Maybe<List<VideoAndTags>>> GetVideos(int page, List<int> tagsSearch, bool suggestion = false)
         {
             var maybe = new Maybe<List<VideoAndTags>>();
             try
@@ -63,7 +63,7 @@ namespace FFhub_backend.Services
                 var skip = (page - 1) * pageSize;
                 var videosAndTags = new List<VideoAndTags>();
 
-                var query = _dbContext.Videos.Include(v => v.VideoTags).ThenInclude(vt => vt.Tag).Where(e => e.IsSuggestion == false).AsQueryable();
+                var query = _dbContext.Videos.Include(v => v.VideoTags).ThenInclude(vt => vt.Tag).Where(e => e.IsSuggestion == suggestion).AsQueryable();
 
                 var videos = await query
                             .Skip(skip)
@@ -162,6 +162,50 @@ namespace FFhub_backend.Services
                 maybe.SetSuccess("ok");
             }
             catch(Exception e)
+            {
+                maybe.SetException("Error " + e.Message);
+            }
+            return maybe;
+        }
+
+        public async Task<Maybe<string>> ReviewVideoSuggestion(int videoId, bool pass, string thumbnail = "") {
+            var maybe = new Maybe<string>();
+
+            try
+            {
+                var video = await _dbContext.Videos.Include(v => v.VideoTags).ThenInclude(vt => vt.Tag).FirstOrDefaultAsync(e => e.VideoId == videoId);
+                if (video != null)
+                {
+                    if (pass)
+                    {
+                        video.IsSuggestion = false;
+                        video.ThumbNail = thumbnail;
+                        var videoTags = await _dbContext.VideoTags.Include(v => v.Tag).Where(e => e.VideoId == video.VideoId).ToListAsync();
+                        for (int i = 0; i < videoTags.Count; i++)
+                        {
+                            var tag = videoTags[i].Tag;
+                            tag.IsSuggestion = false;
+                            _dbContext.Tags.Update(tag);
+                        }
+                        _dbContext.Videos.Update(video);
+                        await _dbContext.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        var videoTags = await _dbContext.VideoTags.Include(v => v.Tag).Where(e => e.VideoId == video.VideoId).ToListAsync();
+                        for (int i = 0; i < videoTags.Count; i++)
+                        {
+                            var tag = videoTags[i].Tag;
+                            _dbContext.Tags.Remove(tag);
+                            _dbContext.VideoTags.Remove(videoTags[i]);
+                        }
+                        _dbContext.Videos.Remove(video);
+                        await _dbContext.SaveChangesAsync();
+                    }
+                    maybe.SetSuccess("ok");
+                }
+            }
+            catch (Exception e)
             {
                 maybe.SetException("Error " + e.Message);
             }
