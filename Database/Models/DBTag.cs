@@ -11,6 +11,8 @@ namespace FFhub_backend.Database.Models
         
         public string TagName { get; set; }
 
+        public bool IsSuggestion { get; set; }
+
         // Navigation property for many-to-many relationship
         public ICollection<DBVideoTag> VideoTags { get; set; } = new List<DBVideoTag>();
     }

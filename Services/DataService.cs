@@ -110,7 +110,7 @@ namespace FFhub_backend.Services
             var maybe = new Maybe<List<DBTag>>();
             try
             {
-                var tags = await _dbContext.Tags.Where(e => e.TagName.ToLower().StartsWith(startsWith)).ToListAsync();
+                var tags = await _dbContext.Tags.Where(e => e.IsSuggestion == false && e.TagName.ToLower().StartsWith(startsWith)).ToListAsync();
                 maybe.SetSuccess(tags);
             }
             catch (Exception e) 
@@ -146,6 +146,7 @@ namespace FFhub_backend.Services
                         tag = new DBTag()
                         {
                             TagName = tags[i],
+                            IsSuggestion = true,
                         };
                         await _dbContext.Tags.AddAsync(tag);
                         await _dbContext.SaveChangesAsync();
