@@ -67,5 +67,13 @@ namespace FFhub_backend.Controllers
             var result = await _dataService.ReviewVideoSuggestion(req.VideoId, req.Pass, req.Thumbnail);
             return Ok(result);
         }
+
+        [HttpDelete]
+        [Route("delete")]
+        public async Task<IActionResult> Delte([FromQuery] int id)
+        {
+            var result = await _dataService.DeleteVideo(id);
+            return Ok(result);
+        }
     }
 }

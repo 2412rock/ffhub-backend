@@ -168,6 +168,36 @@ namespace FFhub_backend.Services
             return maybe;
         }
 
+        public async Task<Maybe<string>> DeleteVideo(int videoId)
+        {
+            var maybe = new Maybe<string>();
+            try
+            {
+                var video = await _dbContext.Videos.Include(v => v.VideoTags).ThenInclude(vt => vt.Tag).FirstOrDefaultAsync(e => e.VideoId == videoId);
+                if (video != null)
+                {
+                    var videoTags = await _dbContext.VideoTags.Include(v => v.Tag).Where(e => e.VideoId == video.VideoId).ToListAsync();
+                    for (int i = 0; i < videoTags.Count; i++)
+                    {
+                        var tag = videoTags[i].Tag;
+                        _dbContext.VideoTags.Remove(videoTags[i]);
+                    }
+                    _dbContext.Videos.Remove(video);
+                    await _dbContext.SaveChangesAsync();
+                    maybe.SetSuccess("ok");
+                }
+                else
+                {
+                    maybe.SetException("Video not found");
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+            return maybe;
+        }   
+
         public async Task<Maybe<string>> ReviewVideoSuggestion(int videoId, bool pass, string thumbnail = "") {
             var maybe = new Maybe<string>();
 
@@ -196,13 +226,21 @@ namespace FFhub_backend.Services
                         for (int i = 0; i < videoTags.Count; i++)
                         {
                             var tag = videoTags[i].Tag;
-                            _dbContext.Tags.Remove(tag);
+                            if (tag.IsSuggestion)
+                            {
+                                _dbContext.Tags.Remove(tag);
+                            }
+                            
                             _dbContext.VideoTags.Remove(videoTags[i]);
                         }
                         _dbContext.Videos.Remove(video);
                         await _dbContext.SaveChangesAsync();
                     }
                     maybe.SetSuccess("ok");
+                }
+                else
+                {
+                    maybe.SetException("Video not found");
                 }
             }
             catch (Exception e)
