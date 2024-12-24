@@ -32,7 +32,7 @@ namespace FFhub_backend.Controllers
         }
 
         [HttpDelete]
-        [Route("comments")]
+        [Route("deletecomment")]
         public async Task<IActionResult> DeleteComment([FromQuery] int videoId, int commentId)
         {
             var result = await _commentService.DeleteComment(videoId, commentId);

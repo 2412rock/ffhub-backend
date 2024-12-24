@@ -71,29 +71,38 @@ namespace FFhub_backend.Services
                             .ToListAsync();
                 foreach (var video in videos)
                 {
-                    var tags = new List<string>();
-                    var foundMatchinTag = tagsSearch != null ? false: true;
-                    foreach(var sub in video.VideoTags)
-                    {
-                        if (tagsSearch != null && tagsSearch.Contains(sub.Tag.TagId))
-                        {
-                            foundMatchinTag = true;
-                        }
-                        tags.Add(sub.Tag.TagName);
+                    var addVideo = true;
 
-                    }
-                    if (!foundMatchinTag)
+                    if(tagsSearch != null)
                     {
-                        continue;
+                        tagsSearch.ForEach(searchTagId => {
+                            var match = video.VideoTags.FirstOrDefault(e => e.TagId == searchTagId);
+                            if (match == null)
+                            {
+                                // this tag cannot be found, discard video
+                                addVideo = false;
+                            }
+                        });
                     }
-                    videosAndTags.Add(new VideoAndTags()
+
+                    if (addVideo)
                     {
-                        VideoId = video.VideoId,
-                        Link = video.Link,
-                        Title = video.Title,
-                        ThumbNail = video.ThumbNail,
-                        Tags = tags
-                    });
+                        var tags = new List<string>();
+
+                        foreach (var sub in video.VideoTags)
+                        {
+                            tags.Add(sub.Tag.TagName);
+                        }
+                        videosAndTags.Add(new VideoAndTags()
+                        {
+                            VideoId = video.VideoId,
+                            Link = video.Link,
+                            Title = video.Title,
+                            ThumbNail = video.ThumbNail,
+                            Tags = tags
+                        });
+                    }
+                    
                 }
                 maybe.SetSuccess(videosAndTags);
             }
