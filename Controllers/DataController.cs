@@ -68,6 +68,22 @@ namespace FFhub_backend.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        [Route("addTags")]
+        public async Task<IActionResult> AddTags([FromBody] AddTags req)
+        {
+            var result = await _dataService.AddTagsToVideo(req.VideoId, req.Tags);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("deletetag")]
+        public async Task<IActionResult> DelteTagFromVideo([FromQuery] int videoId, string tag)
+        {
+            var result = await _dataService.DeleteTagFromVideo(videoId, tag);
+            return Ok(result);
+        }
+
         [HttpDelete]
         [Route("delete")]
         public async Task<IActionResult> Delte([FromQuery] int id)

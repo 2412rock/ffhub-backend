@@ -193,10 +193,93 @@ namespace FFhub_backend.Services
             }
             catch (Exception e)
             {
-
+                maybe.SetException(e.Message);
             }
             return maybe;
-        }   
+        }
+
+        public async Task<Maybe<string>> AddTagsToVideo(int videoId, List<string> tags) {
+            var maybe = new Maybe<string>();
+            try
+            {
+                var video = await _dbContext.Videos.Include(v => v.VideoTags).ThenInclude(vt => vt.Tag).FirstOrDefaultAsync(e => e.VideoId == videoId);
+                if(video != null)
+                {
+                    for (int i = 0; i < tags.Count; i++)
+                    {
+                        var tag = await _dbContext.Tags.FirstOrDefaultAsync(e => e.TagName.ToLower() == tags[i]);
+                        if (tag == null)
+                        {
+                            tag = new DBTag()
+                            {
+                                TagName = tags[i],
+                                IsSuggestion = true,
+                            };
+                            await _dbContext.Tags.AddAsync(tag);
+                            await _dbContext.SaveChangesAsync();
+                        }
+                        var videoAndTag = new DBVideoTag()
+                        {
+                            VideoId = video.VideoId,
+                            TagId = tag.TagId,
+                        };
+                        await _dbContext.VideoTags.AddAsync(videoAndTag);
+                    }
+                    await _dbContext.SaveChangesAsync();
+                    maybe.SetSuccess("ok");
+                }
+                else
+                {
+                    maybe.SetException("No video found");
+                }
+            }
+            catch (Exception e)
+            {
+                maybe.SetException(e.Message);
+            }
+
+            return maybe;
+        }
+
+        public async Task<Maybe<string>> DeleteTagFromVideo(int videoId, string tag)
+        {
+            var maybe = new Maybe<string>();
+            try
+            {
+                var video = await _dbContext.Videos.Include(v => v.VideoTags).ThenInclude(vt => vt.Tag).FirstOrDefaultAsync(e => e.VideoId == videoId);
+                if(video != null)
+                {
+                    var tagObj = await _dbContext.Tags.FirstOrDefaultAsync(e => e.TagName == tag);
+                    if(tagObj == null)
+                    {
+                        maybe.SetException("Tag not found");
+                        return maybe;
+                    }
+                    var videoAndTag = video.VideoTags.FirstOrDefault(e => e.TagId == tagObj.TagId);
+                    if(videoAndTag != null)
+                    {
+                        _dbContext.VideoTags.Remove(videoAndTag);
+                        await _dbContext.SaveChangesAsync();
+                        maybe.SetSuccess("ok");
+                    }
+                    else
+                    {
+                        maybe.SetException("Could not find tag for video");
+                    }
+
+                }
+                else
+                {
+                    maybe.SetException("Video not found");
+                }
+            }
+            catch (Exception e)
+            {
+                maybe.SetException(e.Message);
+            }
+
+            return maybe;
+        }
 
         public async Task<Maybe<string>> ReviewVideoSuggestion(int videoId, bool pass, string thumbnail = "") {
             var maybe = new Maybe<string>();
