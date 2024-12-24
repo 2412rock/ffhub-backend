@@ -44,6 +44,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddTransient<DataService>();
+builder.Services.AddTransient<CommentService>();
 var saPassword = Environment.GetEnvironmentVariable("SA_PASSWORD");
 
 builder.Services.AddDbContext<FFDbContext>(options =>
