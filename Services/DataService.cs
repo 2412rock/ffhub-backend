@@ -186,11 +186,19 @@ namespace FFhub_backend.Services
                 if (video != null)
                 {
                     var videoTags = await _dbContext.VideoTags.Include(v => v.Tag).Where(e => e.VideoId == video.VideoId).ToListAsync();
+                    var comments = await _dbContext.Comments.Where(e => e.VideoId == videoId).ToListAsync();
+
                     for (int i = 0; i < videoTags.Count; i++)
                     {
                         var tag = videoTags[i].Tag;
                         _dbContext.VideoTags.Remove(videoTags[i]);
                     }
+
+                    for(int i = 0; i < comments.Count; i++)
+                    {
+                        _dbContext.Comments.Remove(comments[i]);
+                    }
+
                     _dbContext.Videos.Remove(video);
                     await _dbContext.SaveChangesAsync();
                     maybe.SetSuccess("ok");
