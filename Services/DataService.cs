@@ -54,21 +54,64 @@ namespace FFhub_backend.Services
             return maybe;
         }
 
+        public async Task<Maybe<int>> GetVideosCount(List<int> tagsSearch, bool suggestion = false)
+        {
+            var maybe = new Maybe<int>();
+            var count = 0;
+            try
+            {
+                var query = _dbContext.Videos.Include(v => v.VideoTags).ThenInclude(vt => vt.Tag).Where(e => e.IsSuggestion == suggestion).AsQueryable();
+
+                var videos = await query.ToListAsync();
+
+
+                foreach (var video in videos)
+                {
+                    var addVideo = true;
+
+                    if (tagsSearch != null)
+                    {
+                        tagsSearch.ForEach(searchTagId =>
+                        {
+                            var match = video.VideoTags.FirstOrDefault(e => e.TagId == searchTagId);
+                            if (match == null)
+                            {
+                                // this tag cannot be found, discard video
+                                addVideo = false;
+                            }
+                        });
+                    }
+
+                    if (addVideo)
+                    {
+                        count++;
+                    }
+                }
+                maybe.SetSuccess(count);
+            }
+            catch (Exception e)
+            {
+                maybe.SetException("Something went wrong " + e.Message);
+            }
+
+            return maybe;
+        }
         public async Task<Maybe<List<VideoAndTags>>> GetVideos(int page, List<int> tagsSearch, bool suggestion = false)
         {
             var maybe = new Maybe<List<VideoAndTags>>();
             try
             {
-                var pageSize = 30; // Number of videos per page
+                var pageSize = 20; // Number of videos per page
                 var skip = (page - 1) * pageSize;
                 var videosAndTags = new List<VideoAndTags>();
 
                 var query = _dbContext.Videos.Include(v => v.VideoTags).ThenInclude(vt => vt.Tag).Where(e => e.IsSuggestion == suggestion).AsQueryable();
 
-                var videos = await query
-                            .Skip(skip)
-                            .Take(pageSize)
-                            .ToListAsync();
+                var videos = await query.ToListAsync();
+                var lastVideoIndex = skip + pageSize;
+                var currentVideoIndex = 0;
+
+
                 foreach (var video in videos)
                 {
                     var addVideo = true;
@@ -93,17 +136,29 @@ namespace FFhub_backend.Services
                         {
                             tags.Add(sub.Tag.TagName);
                         }
-                        videosAndTags.Add(new VideoAndTags()
+                        if(currentVideoIndex == lastVideoIndex)
                         {
-                            VideoId = video.VideoId,
-                            Link = video.Link,
-                            Title = video.Title,
-                            ThumbNail = video.ThumbNail,
-                            Tags = tags
-                        });
+                            break;
+                        }
+                        else if(currentVideoIndex >= skip)
+                        {
+                            videosAndTags.Add(new VideoAndTags()
+                            {
+                                VideoId = video.VideoId,
+                                Link = video.Link,
+                                Title = video.Title,
+                                ThumbNail = video.ThumbNail,
+                                Tags = tags,
+                            });
+                        }
+                       currentVideoIndex++;
                     }
                     
                 }
+
+                videosAndTags.ForEach(e => {
+                    e.TotalVideos = videosAndTags.Count();
+                });
                 maybe.SetSuccess(videosAndTags);
             }
             catch(Exception e)

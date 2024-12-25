@@ -14,9 +14,24 @@ namespace FFhub_backend.Controllers
         {
             _dataService = dataService;
         }
+
+        [HttpGet]
+        [Route("videosCount")]
+        public async Task<IActionResult> GetVideosCount([FromQuery] string? tags)
+        {
+            List<int> tagsList = null;
+            if (!string.IsNullOrEmpty(tags))
+            {
+                tagsList = tags.Split(',').Select(id => int.Parse(id)).ToList();
+            }
+
+            var result = await _dataService.GetVideosCount(tagsList);
+            return Ok(result);
+        }
+
         [HttpGet]
         [Route("videos")]
-        public async Task<IActionResult> GetVideos([FromQuery] string? tags)
+        public async Task<IActionResult> GetVideos([FromQuery] string? tags, int page)
         {
             List<int> tagsList = null;
             if (!string.IsNullOrEmpty(tags))
@@ -24,7 +39,7 @@ namespace FFhub_backend.Controllers
                 tagsList = tags.Split(',').Select(id => int.Parse(id)).ToList();
             }
             
-            var result = await _dataService.GetVideos(1, tagsList);
+            var result = await _dataService.GetVideos(page, tagsList);
             return Ok(result);
         }
 
