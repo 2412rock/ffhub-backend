@@ -59,7 +59,7 @@ namespace FFhub_backend.Services
             var maybe = new Maybe<List<VideoAndTags>>();
             try
             {
-                var pageSize = 15; // Number of videos per page
+                var pageSize = 30; // Number of videos per page
                 var skip = (page - 1) * pageSize;
                 var videosAndTags = new List<VideoAndTags>();
 
