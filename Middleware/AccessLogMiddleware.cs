@@ -16,10 +16,11 @@ namespace FFhub_backend.Middleware
         {
             try
             {
-                var ipAddress = context.Connection.RemoteIpAddress;
-                if (ipAddress != null)
+                // var ipAddress = context.Connection.RemoteIpAddress;
+                var forwardedIp = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+                if (forwardedIp != null)
                 {
-                    await accessLogService.AddLog(ipAddress.ToString());
+                    await accessLogService.AddLog(forwardedIp.ToString());
                 }
             }
             catch { }
