@@ -1,6 +1,7 @@
 using FFhub_backend.Database;
 using FFhub_backend.Middleware;
 using FFhub_backend.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using System.Net;
@@ -56,6 +57,10 @@ builder.Services.AddDbContext<FFDbContext>(options =>
 var app = builder.Build();
 
 app.UseCors("AllowAnyOrigin");
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 // Configure the HTTP request pipeline.
 app.UseMiddleware<AccessLogMiddleware>();
 
