@@ -1,4 +1,5 @@
 using FFhub_backend.Database;
+using FFhub_backend.Middleware;
 using FFhub_backend.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
@@ -45,6 +46,8 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddTransient<DataService>();
 builder.Services.AddTransient<CommentService>();
+builder.Services.AddTransient<AccessLogService>();
+
 var saPassword = Environment.GetEnvironmentVariable("SA_PASSWORD");
 
 builder.Services.AddDbContext<FFDbContext>(options =>
@@ -54,6 +57,7 @@ var app = builder.Build();
 
 app.UseCors("AllowAnyOrigin");
 // Configure the HTTP request pipeline.
+app.UseMiddleware<AccessLogMiddleware>();
 
 app.UseAuthorization();
 

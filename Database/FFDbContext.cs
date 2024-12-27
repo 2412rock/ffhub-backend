@@ -9,6 +9,7 @@ namespace FFhub_backend.Database
         public DbSet<DBTag> Tags { get; set; }
         public DbSet<DBVideoTag> VideoTags { get; set; }
         public DbSet<DBComment> Comments { get; set; }
+        public DbSet<DBAccessLog> AccessLogs { get; set; }
 
         public FFDbContext(DbContextOptions<FFDbContext> options) : base(options)
         { }
