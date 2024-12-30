@@ -79,32 +79,56 @@ namespace FFhub_backend.Controllers
         [Route("reviewSuggestion")]
         public async Task<IActionResult> ReviewSuggestion([FromBody] ReviewSuggestion req)
         {
-            var result = await _dataService.ReviewVideoSuggestion(req.VideoId, req.Pass, req.Thumbnail);
-            return Ok(result);
+            if(req.AdminPass == Environment.GetEnvironmentVariable("admin_pass"))
+            {
+                var result = await _dataService.ReviewVideoSuggestion(req.VideoId, req.Pass, req.Thumbnail);
+                return Ok(result);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         [HttpPost]
         [Route("addTags")]
         public async Task<IActionResult> AddTags([FromBody] AddTags req)
         {
-            var result = await _dataService.AddTagsToVideo(req.VideoId, req.Tags);
-            return Ok(result);
+            if (req.AdminPass == Environment.GetEnvironmentVariable("admin_pass"))
+            {
+                var result = await _dataService.AddTagsToVideo(req.VideoId, req.Tags);
+                return Ok(result);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
+               
 
         [HttpDelete]
         [Route("deletetag")]
-        public async Task<IActionResult> DelteTagFromVideo([FromQuery] int videoId, string tag)
+        public async Task<IActionResult> DelteTagFromVideo([FromQuery] int videoId, string tag, string adminPass)
         {
-            var result = await _dataService.DeleteTagFromVideo(videoId, tag);
-            return Ok(result);
+            if (adminPass == Environment.GetEnvironmentVariable("admin_pass"))
+            {
+                var result = await _dataService.DeleteTagFromVideo(videoId, tag);
+                return Ok(result);
+            }
+            return Unauthorized();
+               
         }
 
         [HttpDelete]
         [Route("delete")]
-        public async Task<IActionResult> Delte([FromQuery] int id)
+        public async Task<IActionResult> Delte([FromQuery] int id, string adminPass)
         {
-            var result = await _dataService.DeleteVideo(id);
-            return Ok(result);
+            if (adminPass == Environment.GetEnvironmentVariable("admin_pass"))
+            {
+                var result = await _dataService.DeleteVideo(id);
+                return Ok(result);
+            }
+            return Unauthorized(); 
         }
     }
 }

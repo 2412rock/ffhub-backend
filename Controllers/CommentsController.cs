@@ -33,10 +33,14 @@ namespace FFhub_backend.Controllers
 
         [HttpDelete]
         [Route("deletecomment")]
-        public async Task<IActionResult> DeleteComment([FromQuery] int videoId, int commentId)
+        public async Task<IActionResult> DeleteComment([FromQuery] int videoId, int commentId, string adminPass)
         {
-            var result = await _commentService.DeleteComment(videoId, commentId);
-            return Ok(result);
+            if (adminPass == Environment.GetEnvironmentVariable("admin_pass"))
+            {
+                var result = await _commentService.DeleteComment(videoId, commentId);
+                return Ok(result);
+            }
+            return Unauthorized();   
         }
     }
 }

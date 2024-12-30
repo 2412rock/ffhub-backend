@@ -4,5 +4,6 @@
     {
         public int VideoId { get; set; }
         public List<string> Tags { get; set; }
+        public string AdminPass { get; set; }
     }
 }
