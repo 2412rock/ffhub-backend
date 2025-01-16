@@ -10,10 +10,12 @@ namespace FFhub_backend.Services
     public class DataService
     {
         private readonly FFDbContext _dbContext;
+        private readonly MailService _mailService;
 
-        public DataService(FFDbContext dbContext)
+        public DataService(FFDbContext dbContext, MailService mailService)
         {
             _dbContext = dbContext;
+            _mailService = mailService;
         }
 
         public async Task<Maybe<VideoAndTags>> GetVideo(int id)
@@ -223,6 +225,7 @@ namespace FFhub_backend.Services
                     await _dbContext.VideoTags.AddAsync(videoAndTag);
                 }
                 await _dbContext.SaveChangesAsync();
+                _mailService.SendMail();
                 maybe.SetSuccess("ok");
             }
             catch(Exception e)

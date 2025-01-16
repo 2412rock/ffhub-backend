@@ -48,6 +48,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddTransient<DataService>();
 builder.Services.AddTransient<CommentService>();
 builder.Services.AddTransient<AccessLogService>();
+builder.Services.AddTransient<MailService>();
 
 var saPassword = Environment.GetEnvironmentVariable("SA_PASSWORD");
 
