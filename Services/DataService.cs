@@ -38,7 +38,8 @@ namespace FFhub_backend.Services
                         Title = video.Title,
                         ThumbNail = video.ThumbNail,
                         Link = video.Link,
-                        Tags = tags
+                        Tags = tags,
+                        Views = video.Views,
                     };
 
                     maybe.SetSuccess(result);

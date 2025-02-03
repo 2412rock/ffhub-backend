@@ -8,5 +8,6 @@
         public string ThumbNail { get; set; }
         public List<string> Tags { get; set; }
         public int TotalVideos { get; set; }
+        public int Views { get; set; }
     }
 }

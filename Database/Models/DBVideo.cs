@@ -11,8 +11,8 @@ namespace FFhub_backend.Database.Models
         public string Title { get; set; }
         public string Link  { get; set; }
         public bool IsSuggestion { get; set; }
-
         public string ThumbNail { get; set; }
+        public int Views { get; set; }
 
         public ICollection<DBVideoTag> VideoTags { get; set; } = new List<DBVideoTag>();
     }
