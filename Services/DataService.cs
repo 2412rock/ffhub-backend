@@ -41,7 +41,10 @@ namespace FFhub_backend.Services
                         Tags = tags,
                         Views = video.Views,
                     };
-
+                    video.Views += 1;
+                    // increase views
+                    _dbContext.Videos.Update(video);
+                    await _dbContext.SaveChangesAsync();
                     maybe.SetSuccess(result);
                 }
                 else
