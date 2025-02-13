@@ -52,8 +52,10 @@ builder.Services.AddTransient<MailService>();
 
 var saPassword = Environment.GetEnvironmentVariable("SA_PASSWORD");
 
+string hostIp =  Environment.GetEnvironmentVariable("DB_IP");
+
 builder.Services.AddDbContext<FFDbContext>(options =>
-    options.UseSqlServer($"Server=10.244.17.97,1433;Database=FfhubDB;User Id=sa;Password={saPassword};TrustServerCertificate=True"));
+    options.UseSqlServer($"Server={hostIp},1433;Database=FfhubDB;User Id=sa;Password={saPassword};TrustServerCertificate=True"));
 
 var app = builder.Build();
 
