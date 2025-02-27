@@ -29,12 +29,12 @@ namespace FFhub_backend.Controllers
                 }
                 else
                 {
-                    maybe.SetException("tag is null");
+                    return StatusCode(500, "Tag is null");
                 }
             }
             catch (Exception e)
             {
-                maybe.SetException("Database error occured " + e.Message);
+                return StatusCode(500, "Database connection failed");
             }
 
             return Ok(maybe);
