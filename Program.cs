@@ -19,7 +19,7 @@ builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(4500, listenOptions =>
     {
-        //listenOptions.UseHttps("/app/backendcertificate.pfx");
+        listenOptions.UseHttps("/app/backendcertificate.pfx");
     });
 });
 // Add services to the container.
