@@ -8,13 +8,16 @@ namespace FFhub_backend.Services
     public class AccessLogService
     {
         private readonly FFDbContext _dbContext;
-        public AccessLogService(FFDbContext dbContext)
+        private readonly MailService _mailService;
+        public AccessLogService(FFDbContext dbContext, MailService mailService)
         {
             _dbContext = dbContext;
+            _mailService = mailService;
         }
 
         public async Task AddLog(string ipAddress)
         {
+            _mailService.SendMailAccessLog(ipAddress);
             var existingLog = await _dbContext.AccessLogs.FirstOrDefaultAsync(e => e.IpAddress == ipAddress);
             if (existingLog == null)
             {

@@ -18,6 +18,7 @@ namespace FFhub_backend.Middleware
             {
                 // var ipAddress = context.Connection.RemoteIpAddress;
                 var ip = context.Connection.RemoteIpAddress?.ToString();
+                Console.WriteLine($"Got request from ip {ip}");
                 if (ip != null)
                 {
                     await accessLogService.AddLog(ip);
