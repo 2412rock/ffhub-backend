@@ -17,7 +17,7 @@ namespace FFhub_backend.Middleware
             try
             {
                 // var ipAddress = context.Connection.RemoteIpAddress;
-                var ip = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+                var ip = context.Connection.RemoteIpAddress?.ToString();
                 Console.WriteLine($"Got request from ip {ip}");
                 if (ip != null)
                 {
