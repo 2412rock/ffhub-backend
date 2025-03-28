@@ -17,7 +17,7 @@ namespace FFhub_backend.Services
 
         public async Task AddLog(string ipAddress)
         {
-            _mailService.SendMailAccessLog(ipAddress);
+           // _mailService.SendMailAccessLog(ipAddress);
             var existingLog = await _dbContext.AccessLogs.FirstOrDefaultAsync(e => e.IpAddress == ipAddress);
             if (existingLog == null)
             {
